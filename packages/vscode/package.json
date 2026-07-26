@@ -1,0 +1,95 @@
+{
+  "name": "asset-lens",
+  "displayName": "Asset Lens",
+  "description": "Find similar and duplicate images in your workspace",
+  "version": "0.0.1",
+  "publisher": "lalith",
+  "engines": {
+    "vscode": "^1.115.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "asset-lens.findSimilarImages",
+        "title": "Asset Lens: Find Similar Images",
+        "icon": "$(search)"
+      }
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "asset-lens",
+          "title": "Asset Lens",
+          "icon": "./assets/icon.svg"
+        }
+      ]
+    },
+    "views": {
+      "asset-lens": [
+        {
+          "id": "asset-lens.resultsView",
+          "name": "Similar Images"
+        }
+      ]
+    },
+    "menus": {
+      "view/title": [
+        {
+          "command": "asset-lens.findSimilarImages",
+          "when": "view == asset-lens.resultsView",
+          "group": "navigation"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "Asset Lens",
+      "properties": {
+        "asset-lens.groupingStrategy": {
+          "type": "string",
+          "enum": ["union-find", "anchor"],
+          "enumDescriptions": [
+            "Union-Find: correctly groups chains (A~B~C → one group). Recommended.",
+            "Anchor: compares all images against the first match only. May miss chains."
+          ],
+          "default": "union-find",
+          "description": "Algorithm used to group similar images."
+        },
+        "asset-lens.similarityThreshold": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 64,
+          "default": 10,
+          "description": "Maximum Hamming distance (0–64) between two image hashes to consider them similar. Lower = stricter."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src",
+    "test": "vscode-test"
+  },
+  "dependencies": {
+    "@asset-lens/core": "^0.0.1",
+    "sharp": "^0.34.5"
+  },
+  "devDependencies": {
+    "@types/mocha": "^10.0.10",
+    "@types/node": "^22.19.17",
+    "@types/vscode": "^1.115.0",
+    "@typescript-eslint/eslint-plugin": "^8.39.0",
+    "@typescript-eslint/parser": "^8.39.0",
+    "@vscode/test-cli": "^0.0.11",
+    "@vscode/test-electron": "^2.5.2",
+    "eslint": "^9.32.0",
+    "typescript": "^5.9.2"
+  }
+}

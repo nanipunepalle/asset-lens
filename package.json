@@ -1,0 +1,17 @@
+{
+  "name": "asset-lens-monorepo",
+  "version": "0.0.1",
+  "description": "Asset Lens — portable core + per-editor extensions for finding similar/duplicate images",
+  "private": true,
+  "author": "Lalith",
+  "workspaces": [
+    "packages/core",
+    "packages/vscode"
+  ],
+  "scripts": {
+    "compile": "npm run compile --workspace @asset-lens/core && npm run compile --workspace asset-lens",
+    "watch": "npm run watch --workspace asset-lens",
+    "lint": "npm run lint --workspaces --if-present",
+    "test": "npm run compile && npm run test --workspaces --if-present"
+  }
+}

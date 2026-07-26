@@ -1,0 +1,28 @@
+{
+  "name": "@asset-lens/core",
+  "version": "0.0.1",
+  "description": "Platform-agnostic core for Asset Lens: perceptual hashing, Hamming distance, and similarity grouping",
+  "author": "Lalith",
+  "license": "MIT",
+  "type": "commonjs",
+  "main": "./out/index.js",
+  "types": "./out/index.d.ts",
+  "files": [
+    "out"
+  ],
+  "scripts": {
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "lint": "eslint src",
+    "test": "mocha out/test/**/*.test.js"
+  },
+  "devDependencies": {
+    "@types/mocha": "^10.0.10",
+    "@types/node": "^22.19.17",
+    "@typescript-eslint/eslint-plugin": "^8.39.0",
+    "@typescript-eslint/parser": "^8.39.0",
+    "eslint": "^9.32.0",
+    "mocha": "^10.7.3",
+    "typescript": "^5.9.2"
+  }
+}
