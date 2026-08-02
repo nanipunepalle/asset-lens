@@ -4,6 +4,28 @@
   "description": "Find similar and duplicate images in your workspace",
   "version": "0.0.1",
   "publisher": "lalith",
+  "license": "MIT",
+  "author": "Lalith Punepalle",
+  "icon": "assets/marketplace-icon.png",
+  "galleryBanner": {
+    "color": "#1b2334",
+    "theme": "dark"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nanipunepalle/asset-lens.git"
+  },
+  "bugs": {
+    "url": "https://github.com/nanipunepalle/asset-lens/issues"
+  },
+  "homepage": "https://github.com/nanipunepalle/asset-lens/blob/main/packages/vscode/README.md",
+  "keywords": [
+    "images",
+    "duplicates",
+    "perceptual hash",
+    "assets",
+    "similarity"
+  ],
   "engines": {
     "vscode": "^1.115.0"
   },
@@ -88,7 +110,7 @@
     "@typescript-eslint/eslint-plugin": "^8.39.0",
     "@typescript-eslint/parser": "^8.39.0",
     "@vscode/test-cli": "^0.0.11",
-    "@vscode/test-electron": "^2.5.2",
+    "@vscode/test-electron": "^3.1.0",
     "eslint": "^9.32.0",
     "typescript": "^5.9.2"
   }

@@ -1,0 +1,76 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test:
+    name: test (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - run: npm run lint
+
+      # The extension tests launch a real VS Code instance, which needs a
+      # display server on Linux.
+      - name: Test (Linux)
+        if: runner.os == 'Linux'
+        run: xvfb-run -a npm test
+
+      - name: Test
+        if: runner.os != 'Linux'
+        run: npm test
+
+  package:
+    name: package (${{ matrix.target }})
+    runs-on: ${{ matrix.runner }}
+    needs: test
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { target: darwin-arm64, runner: macos-latest }
+          - { target: darwin-x64, runner: macos-13 }
+          - { target: win32-x64, runner: windows-latest }
+          - { target: linux-x64, runner: ubuntu-latest }
+          - { target: linux-arm64, runner: ubuntu-24.04-arm }
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - run: npm run compile
+
+      # sharp ships a separate prebuilt binary per platform, so each VSIX must
+      # be built with that platform's binary present. The package script stages
+      # the extension in an isolated temp directory (no parent .git) before
+      # running vsce, so the monorepo itself never ends up inside the VSIX.
+      - name: Build platform-specific VSIX
+        run: npm run package -- ${{ matrix.target }} dist
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: vsix-${{ matrix.target }}
+          path: dist/*.vsix

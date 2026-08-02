@@ -9,3 +9,6 @@ vsc-extension-quickstart.md
 **/*.map
 **/*.ts
 **/.vscode-test.*
+
+# icon source — the rasterised marketplace-icon.png is what ships
+assets/marketplace-icon.svg

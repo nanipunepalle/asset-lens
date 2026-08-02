@@ -3,7 +3,18 @@
   "version": "0.0.1",
   "description": "Asset Lens — portable core + per-editor extensions for finding similar/duplicate images",
   "private": true,
-  "author": "Lalith",
+  "author": "Lalith Punepalle",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nanipunepalle/asset-lens.git"
+  },
+  "bugs": {
+    "url": "https://github.com/nanipunepalle/asset-lens/issues"
+  },
+  "engines": {
+    "node": ">=20"
+  },
   "workspaces": [
     "packages/core",
     "packages/vscode"
@@ -12,6 +23,7 @@
     "compile": "npm run compile --workspace @asset-lens/core && npm run compile --workspace asset-lens",
     "watch": "npm run watch --workspace asset-lens",
     "lint": "npm run lint --workspaces --if-present",
-    "test": "npm run compile && npm run test --workspaces --if-present"
+    "test": "npm run compile && npm run test --workspaces --if-present",
+    "package": "node scripts/stage-vsix.mjs"
   }
 }

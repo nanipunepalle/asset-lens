@@ -1,0 +1,19 @@
+// Launch config for debugging the VS Code extension when the monorepo root is open.
+// Mirrors packages/vscode/.vscode/launch.json but points at the nested extension folder.
+{
+	"version": "0.2.0",
+	"configurations": [
+		{
+			"name": "Run Extension",
+			"type": "extensionHost",
+			"request": "launch",
+			"args": [
+				"--extensionDevelopmentPath=${workspaceFolder}/packages/vscode"
+			],
+			"outFiles": [
+				"${workspaceFolder}/packages/vscode/out/**/*.js"
+			],
+			"preLaunchTask": "${defaultBuildTask}"
+		}
+	]
+}
