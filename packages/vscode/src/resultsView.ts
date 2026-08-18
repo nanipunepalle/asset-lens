@@ -19,7 +19,10 @@ class GroupNode extends vscode.TreeItem {
 }
 
 class ImageNode extends vscode.TreeItem {
-    constructor(public readonly imagePath: string) {
+    constructor(
+        public readonly imagePath: string,
+        public readonly parent: GroupNode
+    ) {
         super(path.basename(imagePath), vscode.TreeItemCollapsibleState.None);
         this.resourceUri = vscode.Uri.file(imagePath);
         this.tooltip = imagePath;
@@ -40,7 +43,7 @@ export class ResultsViewProvider implements vscode.TreeDataProvider<TreeNode> {
     private groups: SimilarityGroup[] = [];
 
     refresh(groups: SimilarityGroup[]): void {
-        this.groups = groups;
+        this.groups = [...groups].sort((a, b) => a.hammingDistance - b.hammingDistance);
         this._onDidChangeTreeData.fire();
     }
 
@@ -62,9 +65,13 @@ export class ResultsViewProvider implements vscode.TreeDataProvider<TreeNode> {
         }
 
         if (element instanceof GroupNode) {
-            return element.group.images.map(p => new ImageNode(p));
+            return element.group.images.map(p => new ImageNode(p, element));
         }
 
         return [];
+    }
+
+    getParent(element: TreeNode): TreeNode | undefined {
+        return element instanceof ImageNode ? element.parent : undefined;
     }
 }

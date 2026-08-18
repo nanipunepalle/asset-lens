@@ -87,6 +87,15 @@
           "maximum": 64,
           "default": 10,
           "description": "Maximum Hamming distance (0–64) between two image hashes to consider them similar. Lower = stricter."
+        },
+        "asset-lens.excludeFolders": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [],
+          "scope": "resource",
+          "description": "Folder names to exclude from scans. Matches at any depth; for example, build excludes build and nested build folders."
         }
       }
     }

@@ -12,7 +12,6 @@ export function activate(context: vscode.ExtensionContext) {
         showCollapseAll: true,
     });
 
-    const source = new VscodeImageSource();
     const hasher = new SharpHasher();
 
     const disposable = vscode.commands.registerCommand('asset-lens.findSimilarImages', async () => {
@@ -27,6 +26,8 @@ export function activate(context: vscode.ExtensionContext) {
         const config = vscode.workspace.getConfiguration('asset-lens');
         const strategy = config.get<GroupingStrategy>('groupingStrategy', 'union-find');
         const threshold = config.get<number>('similarityThreshold', 10);
+        const excludedFolders = config.get<string[]>('excludeFolders', []);
+        const source = new VscodeImageSource(excludedFolders);
 
         await vscode.window.withProgress(
             {
@@ -51,7 +52,10 @@ export function activate(context: vscode.ExtensionContext) {
                 }
 
                 provider.refresh(groups);
-                await treeView.reveal(undefined as any, { focus: true });
+                const [firstNode] = provider.getChildren();
+                if (firstNode) {
+                    await treeView.reveal(firstNode, { focus: true, expand: true });
+                }
                 vscode.window.showInformationMessage(
                     `Asset Lens: Found ${groups.length} group(s) of similar images.`
                 );
