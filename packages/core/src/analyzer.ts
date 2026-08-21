@@ -38,7 +38,11 @@ export async function analyze(
     const hashes: ImageHash[] = [];
     for (const filePath of paths) {
         try {
-            hashes.push({ path: filePath, hash: await hasher.hash(filePath) });
+            if (hasher.fingerprint) {
+                hashes.push({ path: filePath, ...await hasher.fingerprint(filePath) });
+            } else {
+                hashes.push({ path: filePath, hash: await hasher.hash(filePath) });
+            }
         } catch (err) {
             // Skip files that can't be processed (corrupt, unsupported format, etc.)
             console.warn(`Asset Lens: skipping ${filePath} — ${(err as Error).message}`);
@@ -49,7 +53,10 @@ export async function analyze(
     const threshold = options.threshold ?? 10;
 
     progress?.report(`Comparing images (${strategy})...`);
-    const groups = findGroups(hashes, strategy, threshold);
+    const groups = findGroups(hashes, strategy, threshold, {
+        aspectRatioTolerance: options.aspectRatioTolerance,
+        colorDistanceThreshold: options.colorDistanceThreshold,
+    });
 
     return { groups, imageCount: paths.length };
 }

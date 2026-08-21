@@ -96,6 +96,20 @@
           "default": [],
           "scope": "resource",
           "description": "Folder names to exclude from scans. Matches at any depth; for example, build excludes build and nested build folders."
+        },
+        "asset-lens.aspectRatioTolerance": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "default": 0.1,
+          "description": "Maximum relative aspect-ratio difference between similar images. 0.1 allows a 10% difference."
+        },
+        "asset-lens.colorDistanceThreshold": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 255,
+          "default": 60,
+          "description": "Maximum average RGB color distance between similar images. Lower values require closer colors."
         }
       }
     }

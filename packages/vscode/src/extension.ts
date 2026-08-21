@@ -26,6 +26,8 @@ export function activate(context: vscode.ExtensionContext) {
         const config = vscode.workspace.getConfiguration('asset-lens');
         const strategy = config.get<GroupingStrategy>('groupingStrategy', 'union-find');
         const threshold = config.get<number>('similarityThreshold', 10);
+        const aspectRatioTolerance = config.get<number>('aspectRatioTolerance', 0.1);
+        const colorDistanceThreshold = config.get<number>('colorDistanceThreshold', 60);
         const excludedFolders = config.get<string[]>('excludeFolders', []);
         const source = new VscodeImageSource(excludedFolders);
 
@@ -38,7 +40,7 @@ export function activate(context: vscode.ExtensionContext) {
             async progress => {
                 const { groups, imageCount } = await analyze(
                     { source, hasher, progress: { report: message => progress.report({ message }) } },
-                    { strategy, threshold }
+                    { strategy, threshold, aspectRatioTolerance, colorDistanceThreshold }
                 );
 
                 if (imageCount === 0) {

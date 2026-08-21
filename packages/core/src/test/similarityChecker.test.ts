@@ -6,8 +6,13 @@ import {
     findSimilarGroupsUnionFind,
 } from '../similarityChecker.js';
 
-function img(path: string, hash: bigint): ImageHash {
-    return { path, hash };
+function img(
+    path: string,
+    hash: bigint,
+    aspectRatio?: number,
+    averageColor?: { r: number; g: number; b: number }
+): ImageHash {
+    return { path, hash, aspectRatio, averageColor };
 }
 
 /** Build a hash that differs from `base` in exactly `bits` low-order bits. */
@@ -72,6 +77,43 @@ for (const [name, group] of [
             const groups = group([img('a', 0n), img('b', 0n), img('c', 0n)], 10);
             const all = groups.flatMap(g => g.images);
             assert.strictEqual(new Set(all).size, all.length);
+        });
+
+        it('rejects matching hashes with incompatible aspect ratios', () => {
+            const groups = group([
+                img('square', 0n, 1, { r: 50, g: 50, b: 50 }),
+                img('wide', 0n, 2, { r: 50, g: 50, b: 50 }),
+            ]);
+            assert.strictEqual(groups.length, 0);
+        });
+
+        it('allows aspect ratios within the configured tolerance', () => {
+            const groups = group(
+                [img('a', 0n, 1), img('b', 0n, 1.15)],
+                10,
+                { aspectRatioTolerance: 0.2 }
+            );
+            assert.strictEqual(groups.length, 1);
+        });
+
+        it('rejects matching hashes with substantially different colors', () => {
+            const groups = group([
+                img('red', 0n, 1, { r: 255, g: 0, b: 0 }),
+                img('blue', 0n, 1, { r: 0, g: 0, b: 255 }),
+            ]);
+            assert.strictEqual(groups.length, 0);
+        });
+
+        it('allows colors within the configured distance', () => {
+            const groups = group(
+                [
+                    img('dark', 0n, 1, { r: 20, g: 20, b: 20 }),
+                    img('lighter', 0n, 1, { r: 70, g: 70, b: 70 }),
+                ],
+                10,
+                { colorDistanceThreshold: 50 }
+            );
+            assert.strictEqual(groups.length, 1);
         });
     });
 }

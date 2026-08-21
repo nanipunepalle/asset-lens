@@ -1,5 +1,41 @@
-import { ImageHash, SimilarityGroup, GroupingStrategy } from './types.js';
+import {
+    ImageHash,
+    SimilarityGroup,
+    GroupingStrategy,
+    VisualComparisonOptions,
+} from './types.js';
 import { hammingDistance } from './hammingDistance.js';
+
+const DEFAULT_ASPECT_RATIO_TOLERANCE = 0.1;
+const DEFAULT_COLOR_DISTANCE_THRESHOLD = 60;
+
+function passesVisualFilters(
+    a: ImageHash,
+    b: ImageHash,
+    options: VisualComparisonOptions
+): boolean {
+    if (a.aspectRatio !== undefined && b.aspectRatio !== undefined) {
+        const tolerance = options.aspectRatioTolerance ?? DEFAULT_ASPECT_RATIO_TOLERANCE;
+        const difference = Math.abs(a.aspectRatio - b.aspectRatio) /
+            Math.max(a.aspectRatio, b.aspectRatio);
+        if (difference > tolerance) {
+            return false;
+        }
+    }
+
+    if (a.averageColor && b.averageColor) {
+        const threshold = options.colorDistanceThreshold ?? DEFAULT_COLOR_DISTANCE_THRESHOLD;
+        const dr = a.averageColor.r - b.averageColor.r;
+        const dg = a.averageColor.g - b.averageColor.g;
+        const db = a.averageColor.b - b.averageColor.b;
+        const distance = Math.sqrt((dr ** 2 + dg ** 2 + db ** 2) / 3);
+        if (distance > threshold) {
+            return false;
+        }
+    }
+
+    return true;
+}
 
 /**
  * Anchor strategy: each image is compared only against the anchor (first member)
@@ -8,7 +44,8 @@ import { hammingDistance } from './hammingDistance.js';
  */
 export function findSimilarGroups(
     hashes: ImageHash[],
-    threshold: number = 10
+    threshold: number = 10,
+    visualOptions: VisualComparisonOptions = {}
 ): SimilarityGroup[] {
     const visited = new Set<number>();
     const groups: SimilarityGroup[] = [];
@@ -27,7 +64,7 @@ export function findSimilarGroups(
             }
 
             const distance = hammingDistance(hashes[i].hash, hashes[j].hash);
-            if (distance <= threshold) {
+            if (distance <= threshold && passesVisualFilters(hashes[i], hashes[j], visualOptions)) {
                 group.push(hashes[j].path);
                 minDistance = Math.max(minDistance, distance);
                 visited.add(j);
@@ -84,15 +121,16 @@ class UnionFind {
  */
 export function findSimilarGroupsUnionFind(
     hashes: ImageHash[],
-    threshold: number = 10
+    threshold: number = 10,
+    visualOptions: VisualComparisonOptions = {}
 ): SimilarityGroup[] {
     const uf = new UnionFind(hashes.length);
-    const maxDistance = new Map<number, number>(); // root → max hamming distance in its group
+    const maxDistance = new Map<number, number>();
 
     for (let i = 0; i < hashes.length; i++) {
         for (let j = i + 1; j < hashes.length; j++) {
             const distance = hammingDistance(hashes[i].hash, hashes[j].hash);
-            if (distance <= threshold) {
+            if (distance <= threshold && passesVisualFilters(hashes[i], hashes[j], visualOptions)) {
                 uf.union(i, j);
                 const root = uf.find(i);
                 maxDistance.set(root, Math.max(maxDistance.get(root) ?? 0, distance));
@@ -124,9 +162,10 @@ export function findSimilarGroupsUnionFind(
 export function findGroups(
     hashes: ImageHash[],
     strategy: GroupingStrategy = 'union-find',
-    threshold: number = 10
+    threshold: number = 10,
+    visualOptions: VisualComparisonOptions = {}
 ): SimilarityGroup[] {
     return strategy === 'union-find'
-        ? findSimilarGroupsUnionFind(hashes, threshold)
-        : findSimilarGroups(hashes, threshold);
+        ? findSimilarGroupsUnionFind(hashes, threshold, visualOptions)
+        : findSimilarGroups(hashes, threshold, visualOptions);
 }

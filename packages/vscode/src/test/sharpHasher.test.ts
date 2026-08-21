@@ -54,6 +54,17 @@ suite('SharpHasher', () => {
         assert.strictEqual(typeof (await hasher.hash(file)), 'bigint');
     });
 
+    test('fingerprint includes aspect ratio and average color', async () => {
+        const file = track(tmpPath('fingerprint.png'));
+        await createSolidImage(file, 200, 50, 25, 64, 32);
+
+        const fingerprint = await hasher.fingerprint(file);
+        assert.strictEqual(fingerprint.aspectRatio, 2);
+        assert.ok(Math.abs(fingerprint.averageColor.r - 200) < 1);
+        assert.ok(Math.abs(fingerprint.averageColor.g - 50) < 1);
+        assert.ok(Math.abs(fingerprint.averageColor.b - 25) < 1);
+    });
+
     test('identical images produce the same hash', async () => {
         const file1 = track(tmpPath('same1.png'));
         const file2 = track(tmpPath('same2.png'));

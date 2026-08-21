@@ -35,6 +35,8 @@ Click any image to open it.
 | `asset-lens.similarityThreshold` | `10` | Maximum Hamming distance (0–64) between two hashes for the images to count as similar. Lower is stricter — `0` means the hashes are identical. |
 | `asset-lens.groupingStrategy` | `union-find` | `union-find` groups transitive chains (if A~B and B~C, all three land in one group). `anchor` compares every image only against the first member of a group, so it may split chains. |
 | `asset-lens.excludeFolders` | `[]` | Folder names to leave out of scans, at any depth. For example, `["build", "dist"]` skips generated copies. |
+| `asset-lens.aspectRatioTolerance` | `0.1` | Maximum relative aspect-ratio difference. The default permits a 10% difference. |
+| `asset-lens.colorDistanceThreshold` | `60` | Maximum average RGB color distance (0-255). Lower values require more similar colors. |
 
 To exclude generated assets in the current workspace, add this to
 `.vscode/settings.json`:
